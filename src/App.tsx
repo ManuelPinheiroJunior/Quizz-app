@@ -1,11 +1,12 @@
-import React, { useState } from 'react';
+import React, { Key, useEffect, useState } from 'react';
 import { fetchQuizQuestions } from './API';
 // Components
-import QuestionCard from './components/QuestionCard';
+import QuestionCard from './components/QuestionCard/QuestionCard';
 // types
-import { QuestionsState, Difficulty } from './API';
+import { QuestionsState } from './API';
 // Styles
 import { GlobalStyle, Wrapper } from './App.styles';
+import BotonCambioPerfil from './components/RadioDifficulty/RadioDifficulty';
 
 export type AnswerObject = {
   question: string;
@@ -23,13 +24,23 @@ const App: React.FC = () => {
   const [userAnswers, setUserAnswers] = useState<AnswerObject[]>([]);
   const [score, setScore] = useState(0);
   const [gameOver, setGameOver] = useState(true);
+  const [difficultyType, setDifficultyType] = useState<string>("easy");
+  const [victory, setVictory] = useState<boolean>(false);
+
+
+  useEffect(() => {
+    if (score >= 8 && userAnswers.length === TOTAL_QUESTIONS) {
+      setVictory(true);
+    }
+  }, [score, userAnswers]);
 
   const startTrivia = async () => {
     setLoading(true);
     setGameOver(false);
+    setVictory(false);
     const newQuestions = await fetchQuizQuestions(
       TOTAL_QUESTIONS,
-      Difficulty.EASY
+      difficultyType
     );
     setQuestions(newQuestions);
     setScore(0);
@@ -56,11 +67,11 @@ const App: React.FC = () => {
       setUserAnswers((prev) => [...prev, answerObject]);
     }
   };
-
+  
   const nextQuestion = () => {
     // Move on to the next question if not the last question
     const nextQ = number + 1;
-
+    
     if (nextQ === TOTAL_QUESTIONS) {
       setGameOver(true);
     } else {
@@ -70,13 +81,16 @@ const App: React.FC = () => {
 
   return (
     <>
-      <GlobalStyle />
+      <GlobalStyle victory={victory}/>
       <Wrapper>
-        <h1>REACT QUIZ</h1>
+        <h1>PORKZ QUIZ</h1>
         {gameOver || userAnswers.length === TOTAL_QUESTIONS ? (
+          <>
+          <BotonCambioPerfil  difficultyType={difficultyType}  setDifficultyType={setDifficultyType} />
           <button className='start' onClick={startTrivia}>
             Start
           </button>
+          </>
         ) : null}
         {!gameOver ? <p className='score'>Score: {score}</p> : null}
         {loading ? <p>Loading Questions...</p> : null}

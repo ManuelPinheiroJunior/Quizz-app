@@ -1,13 +1,14 @@
 import styled, { createGlobalStyle } from 'styled-components';
-import BGImage from './images/nattu-adnan-unsplash.jpg';
+import BGImage from './images/citadel.gif';
+import victoryImage from './images/winner.jpg';
 
-export const GlobalStyle = createGlobalStyle`
+export const GlobalStyle = createGlobalStyle<{victory: boolean}>`
   html {
     height: 100%;
   }
 
   body {
-    background-image: url(${BGImage});
+    background-image: url(${props => props.victory ? victoryImage : BGImage}) ;
     background-size: cover;
     margin: 0;
     padding: 0 20px;
